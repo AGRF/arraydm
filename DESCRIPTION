@@ -7,7 +7,7 @@ Author: Lesley Gray <lesley.gray@agrf.org.au>
 Maintainer: Lesley Gray <lesley.gray@agrf.org.au>
 Description: Provides functions for analysis of methylation array data. 
     Includes data QC, differential methylation, post-qc and visualisation of results.
-Depends: R (>= 3.4.4)
+Depends: R (>= 4.0.2)
 Imports:
     annotate,
     arrayQualityMetrics,
