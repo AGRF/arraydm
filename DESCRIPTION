@@ -1,11 +1,33 @@
 Package: arraydm
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: AGRF Differential Methylation Analysis Package
+Version: 0.1
+Date: 07/08/2020
+Author: Lesley Gray <lesley.gray@agrf.org.au>
+Maintainer: Lesley Gray <lesley.gray@agrf.org.au>
+Description: Provides functions for analysis of methylation array data. 
+    Includes data QC, differential methylation, post-qc and visualisation of results.
+Depends: R (>= 3.4.4)
+Imports:
+    annotate,
+    arrayQualityMetrics,
+    DBI,
+    biomaRt,
+    GOstats,
+    gplots,
+    IlluminaHumanMethylationEPICanno.ilm10b4.hg19,
+    limma,
+    lumi,
+    lumiHumanAll.db,
+    org.Hs.eg.db,
+    RColorBrewer,
+    reactome.db
+Suggests:
+    dplyr,
+    reshape2,
+    ggplot2,
+    testthat
+License: Proprietary. Do not use outside AGRF.
 Encoding: UTF-8
-LazyData: true
+LazyData: TRUE
+RoxygenNote: 7.1.1
