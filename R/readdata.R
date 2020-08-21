@@ -25,7 +25,7 @@ readdata <- function(contractid, workdir, samplesheet) {
 
   targets <- tryCatch(read.metharray.sheet(base=workdir, pattern=samplesheet),
                   error=function(e) {print(paste("Samplesheet error in", samplesheet))})
-  data <- tryCatch(read.metharray.exp(base = paste0(workdir,"/", IDAT"),
+  data <- tryCatch(read.metharray.exp(base = paste0(workdir,"/", IDAT)),
                   error=function(e) {print(paste("IDAT/ not found in ", workdir))})
   value <- list(targets=targets, data=data)
   attr(value, 'class') <- 'rawdata'
