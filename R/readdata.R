@@ -31,10 +31,3 @@ readdata <- function(contractid, workdir, samplesheet) {
   attr(value, 'class') <- 'rawdata'
   value
 }
-
-## Usage:
-# readdata(contractid="ILMLEPIC-15325", workdir="/data/Analysis/Genotyping/CAGRF12345/", samplesheet=".csv$")
-
-
-
-
