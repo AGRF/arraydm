@@ -29,8 +29,9 @@ readdata <- function(contractid, workdir, samplesheet) {
 
   targets <- tryCatch(minfi::read.metharray.sheet(base=workdir, pattern=samplesheet),
                   error=function(e) {print(paste("Samplesheet error in", samplesheet))})
-  data <- tryCatch(minfi::read.metharray.exp(base = paste0(workdir,"/", IDAT)),
-                  error=function(e) {print(paste("IDAT/ not found in ", workdir))})
+  data <- tryCatch(minfi::read.metharray.exp(base = paste0(workdir,"/", "IDAT")),
+                   error = function(e) {print(paste("error: IDAT/ not found in ", workdir))},
+                   warning = function(w) {print(paste('warning: ', w))})
   value <- list(targets=targets, data=data)
   attr(value, 'class') <- 'rawdata'
   value
