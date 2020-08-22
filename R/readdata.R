@@ -1,5 +1,6 @@
 #' A function to load array data
 #'
+#' @import arraydm
 #' @param contractid The name of the contract
 #' @param workdir The path of the working directory
 #' @param samplesheet The suffix of the sample sheet
@@ -7,25 +8,28 @@
 #' @export
 readdata <- function(contractid, workdir, samplesheet) {
   if (!requireNamespace("minfi", quietly = TRUE)) {
-    stop("Package \"pkg\" needed for this function to work. Please install it.",
+    stop("Package \"minfi\" needed for this function to work. Please install it.",
     call. = FALSE)
   }
 
   if(missing(contractid)){
     message("contractid is missing…")
+    exit()
   }
 
   if(missing(workdir)){
     message("workdir is missing…")
+    exit()
   }
 
   if(missing(samplesheet)){
     message("samplesheet is missing…")
+    exit()
   }
 
-  targets <- tryCatch(read.metharray.sheet(base=workdir, pattern=samplesheet),
+  targets <- tryCatch(minfi::read.metharray.sheet(base=workdir, pattern=samplesheet),
                   error=function(e) {print(paste("Samplesheet error in", samplesheet))})
-  data <- tryCatch(read.metharray.exp(base = paste0(workdir,"/", IDAT)),
+  data <- tryCatch(minfi::read.metharray.exp(base = paste0(workdir,"/", IDAT)),
                   error=function(e) {print(paste("IDAT/ not found in ", workdir))})
   value <- list(targets=targets, data=data)
   attr(value, 'class') <- 'rawdata'
