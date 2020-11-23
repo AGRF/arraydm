@@ -14,7 +14,7 @@ readdata(contractid, workdir, samplesheet)
 \item{samplesheet}{The suffix of the sample sheet}
 }
 \value{
-The readdata object containing the methylation experiment
+The readdata object containing the methylation experiment and accompanying annotations
 }
 \description{
 A function to load array data

@@ -1,0 +1,16 @@
+load("/Users/LelGray/Dropbox/weekend_work/arraydm/data/testing.Rds")
+load("/Users/LelGray/Dropbox/weekend_work/arraydm/data/samples.Rds")
+data
+data2
+load("/Users/LelGray/Dropbox/weekend_work/arraydm/data/sampledata.Rds")
+targets
+class(targets)
+load("/Users/LelGray/Dropbox/weekend_work/arraydm/data/sampledata.Rds")
+load("/Users/LelGray/Dropbox/weekend_work/arraydm/data/arraydata.Rds")
+load("/Users/LelGray/Dropbox/weekend_work/arraydm/data/exampledata.Rds")
+arraydata
+exampledata
+ls()
+data
+load("/Users/LelGray/Dropbox/weekend_work/arraydm/data/sampledata.Rds")
+ls()
