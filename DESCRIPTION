@@ -1,8 +1,8 @@
 Package: arraydm
 Type: Package
 Title: AGRF Differential Methylation Analysis Package
-Version: 1.0
-Date: 07/08/2020
+Version: 1.1
+Date: 25/11/2020
 Author: Lesley Gray <lesley.gray@agrf.org.au>
 Maintainer: Lesley Gray <lesley.gray@agrf.org.au>
 Description: Provides functions for analysis of methylation array data. 
@@ -24,6 +24,7 @@ Imports:
     org.Hs.eg.db,
     pheatmap,
     RColorBrewer,
+    ReactomePA,
     reactome.db,
     viridis
 Suggests:

@@ -1,22 +1,41 @@
+#' RunDM
+#'
 #' A function to run differential methylation
 #'
 #' @param contractid Character. The name of the contract or other value
-#' @param contrasts A named list with contrasts to apply
-#' @param mdata A cleaned, quality controlled data frame of M-values
-#' @param sampledata A data frame with the samplesheet.Generate manually or in arraydm::readdata().
-#' @param workdir Where to save the results (Default: working directory)
+#' @param contrasts List. Named list with contrasts to apply
+#' @param mdata Data Frame. Cleaned, quality controlled M-values
+#' @param sampledata Data Frame. The project samplesheet. Generate manually or in arraydm::readdata().
+#' @param workdir Character. Where to save the results (Default: working directory)
 #' @return A data frame of modelling results
 #' @export
 arraymodel <- function(contractid, mdata, sampledata, contrastl, workdir=NULL) {
-  for (package in c("limma")) {
-    if (!requireNamespace(package, quietly = TRUE)) {
-      stop(paste0("The ", package, " package is needed for this function to work. Please install it."),
+  if (!requireNamespace("limma", quietly = TRUE)) {
+      stop(paste0("The limma package is needed for this function to work. Please install it."),
            call. = FALSE)
-    }
+  }
+
+  if(missing(workdir)){
+    workdir=getwd()
+  }
+
+  if(missing(contractid)){
+    message("error: contractid is missing......")
+    stop()
+  }
+
+  if(missing(sampledata)){
+    message("error: sampledata is missing......")
+    stop()
   }
 
   if(missing(contrastl)){
     message("error: contrastl are missing…")
+    stop()
+  }
+
+  if(missing(mdata)){
+    message("error: mdata is missing…")
     stop()
   }
 
@@ -64,25 +83,34 @@ arraymodel <- function(contractid, mdata, sampledata, contrastl, workdir=NULL) {
   ## Pairwise (SEM)
   lrt_list <- vector(mode="list", length=length(comparisons))
   names(lrt_list) = comparisons
+  i=1
   for (comparison in comparisons){
-    fit2 <- limma::contrasts.fit(fit, cont.matrix[,comparison])
+    cont = as.matrix(cont.matrix[, i])
+    colnames(cont) <- comparison
+
+    #fit2 <- limma::contrasts.fit(fit, cont.matrix[,comparison])
+    fit2 <- limma::contrasts.fit(fit, cont)
     fit2 <- limma::eBayes(fit2)
+    # colnames(fit2$coefficients) <- colnames(cont.matrix)
 
     # Save the table of results:
-    print("OK1")
     lrt_list[[comparison]] <- limma::topTable(fit2, adjust="BH", number=Inf)
-    print("OK2")
     res50 <- limma::topTable(fit2, adjust="BH", number=50, coef=comparison)
-    print("OK3")
-    resall <- limma::topTable(fit2, adjust="BH", num=Inf, coef=comparison)
+    resall <- limma::topTable(fit2, adjust="BH", number=Inf, coef=comparison)
 
     # write.table(res50, paste(outprefix,"_",comparison,"_LR_raw_top50.csv", sep=""), quote=F, sep="\t", col.names=T, row.names=T)
-    write.table(resall, paste(outprefix,"_",comparison,"_LR_raw.csv", sep=""), quote=F, sep="\t", col.names=T, row.names=T)
+    write.table(resall, paste0(workdir,"/secondary_analysis/", contractid, "_",comparison,"_LR_raw.csv", sep=""), quote=F, sep="\t", col.names=T, row.names=T)
+    i=i+1
   }
 
+saveRDS(lrt_list, paste0(workdir, "/secondary_analysis/", "lrt_list.RDS"))
+
   ## For non-significant contrasts
-#  for (comparison in comparisons){
-#    resall <- topTable(fit2, adjust="BH", num=Inf, coef=comparison)
-#    write.table(format(resall, digits=4), paste(outprefix,"_",comparison,"_LR_raw.csv", sep=""), quote=F, sep="\t", col.names=T, row.names=T)
-#  }
+  # for (comparison in comparisons){
+  #  resall <- topTable(fit2, adjust="BH", num=Inf, coef=comparison)
+  #  write.table(format(resall, digits=4), paste(outprefix,"_",comparison,"_LR_raw.csv", sep=""), quote=F, sep="\t", col.names=T, row.names=T)
+  # }
 }
+
+
+

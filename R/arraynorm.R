@@ -1,15 +1,15 @@
 #' Normalises methylation array data
 #'
 #' @param arraydata An RGChannelSet generated manually, or in arraydm::readdata()
-#' @param contractid The name of the contract
-#' @param mdataraw A filtered data frame of M-values
-#' @param sampledata A data frame with the samplesheet.Generate manually or in arraydm::readdata()
-#' @param workdir Where to save the plots. (Default: working directory)
-#' @return PreQC plots for detection p-value, quality filtered probe set
+#' @param contractid Character. The name of the contract
+#' @param mdataraw Data Frame. A filtered data frame of M-values
+#' @param sampledata Data Frame. The project samplesheet, generate manually or in arraydm::readdata()
+#' @param workdir Character. Where to save the plots. (Default: working directory)
+#' @return PreQC plots for detection p-value, quality filtered probe set. 'swannorm' global object.
 #' @export
 arraynorm <- function(contractid, arraydata, mdataraw, sampledata, workdir=NULL) {
-  if (!requireNamespace("arrayQualityMetrics", quietly = TRUE)) {
-    stop("RColorBrewer is needed for this function to work. Please install it.",
+  if (!requireNamespace("minfi", quietly = TRUE)) {
+    stop("minfi is needed for this function to work. Please install it.",
          call. = FALSE)
   }
 
@@ -41,8 +41,8 @@ arraynorm <- function(contractid, arraydata, mdataraw, sampledata, workdir=NULL)
 
   ## Normalise
   print("Normalising Arrays..........")
-  rawswan = preprocessSWAN(arraydata)
-  rawquant = preprocessQuantile(arraydata)
+  rawswan = minfi::preprocessSWAN(arraydata)
+  rawquant = minfi::preprocessQuantile(arraydata)
 
   ## Plot Normalised mvals
   print("Plotting Results..........")
@@ -50,6 +50,6 @@ arraynorm <- function(contractid, arraydata, mdataraw, sampledata, workdir=NULL)
 
   ## Swan normalise raw data GenomicMethylSet
   print("Proceeding with SWAN normalisation..........")
-  swannorm = preprocessSWAN(rgSet = arraydata, mSet = mdataraw, verbose=TRUE)
-  swannorm <<- mapToGenome(swannorm)
+  swannorm = minfi::preprocessSWAN(rgSet = arraydata, mSet = mdataraw, verbose=TRUE)
+  swannorm <<- minfi::mapToGenome(swannorm)
 }

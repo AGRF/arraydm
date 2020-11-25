@@ -2,22 +2,22 @@
 % Please edit documentation in R/lumiqc.R
 \name{.plotLumiQC}
 \alias{.plotLumiQC}
-\title{A function to run lumi QC}
+\title{Plot QC results}
 \usage{
-.plotLumiQC(plotprefix, mdata, sampledata, pdata, qctype, workdir = NULL)
+.plotLumiQC(contractid, mdata, sampledata, pdata, qctype, workdir = NULL)
 }
 \arguments{
-\item{plotprefix}{Character. The name of the contract or other value}
+\item{contractid}{Character. The name of the contract or other value}
 
-\item{mdata}{A filtered data frame of M-values}
+\item{mdata}{Data Frame. A filtered data frame of M-values}
 
-\item{sampledata}{A data frame with the samplesheet.Generate manually or in arraydm::readdata().}
+\item{sampledata}{Data Frame. The project samplesheet.Generate manually or in arraydm::readdata().}
 
-\item{pdata}{A filtered data frame of detection p-values.}
+\item{pdata}{Data Frame. A filtered data frame of detection p-values.}
 
 \item{qctype}{Character indicating whether preQC or postQC is undertaken}
 
-\item{workdir}{Where to save the plots. (Default: working directory)}
+\item{workdir}{Character. Where to save the plots. (Default: working directory)}
 }
 \value{
 Default lumi QC plots

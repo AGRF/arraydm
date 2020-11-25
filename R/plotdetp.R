@@ -1,13 +1,20 @@
 #' Visualises the detection P value of array prior to filtering
 #'
-#' @param contractid The name of the contract
-#' @param pvals Data Frame with detection P-values
+#' @param contractid Character. The name of the contract
+#' @param pvals Data Frame. Detection P-values
+#' @param sampledata Data Frame. The project samplesheet.Generate manually or in arraydm::readdata()
+#' @param workdir Character. Path to output location. (Default is working directory)
 #' @return A barplot of the detection P values for the unfiltered array
 #' @export
-.plotDetP <- function(contractid, pvals, workdir) {
+.plotDetP <- function(contractid, pvals, sampledata, workdir) {
   if (!requireNamespace("RColorBrewer", quietly = TRUE)) {
     stop("The RColorBrewer package is needed for this function to work. Please install it.",
          call. = FALSE)
+  }
+
+  if(missing(workdir)){
+    message("error: workdir is missing......")
+    exit()
   }
 
   if(missing(contractid)){
@@ -15,18 +22,32 @@
     exit()
   }
 
+  if(missing(sampledata)){
+    message("error: workdir is missing......")
+    exit()
+  }
+
   if(missing(pvals)){
     message("error: input 'pvals' not found.....")
     exit()
   }
+  print("Sampledata is:")
+  print(sampledata)
 
-  dir.create(paste0(workdir,"/secondary_analysis/Results/preqc"), showWarnings = FALSE, recursive=TRUE)
-  png(paste(workdir,"/secondary_analysis/Results/preqc/", contractid,"_preQC_detectionP.png", sep=""), res=200, height=1000, width=1000)
-    barplot(apply(pvals, 2 ,mean), las=2, cex.names=0.5, cex.axis=0.75,
-        names.arg=targets$Sample_Name,
-        col=pal[as.factor(targets$Sample_Group)],
-        main="Mean detection p-values by sample", ylab="Mean detection p-value")
+  ## Take the mean
+  plotdata = apply(pvals, 2 ,mean)
+  print(class(plotdata))
+  print(sampledata$Sample_Name)
+  print(class(sampledata$Sample_Name))
+
+  ## Plot Detection P
+  png(paste(workdir,"/secondary_analysis/Results/qc/", contractid,"_preQC_detectionP.png", sep=""), res=200, height=1000, width=1000)
+    barplot(plotdata, las=2, cex.names=0.5, cex.axis=0.75,
+        names.arg=sampledata$Sample_Name,
+        col=pal[as.factor(sampledata$Sample_Group)],
+        main="Mean detection p-values by sample",
+        ylab="Mean detection p-value")
     abline(h=0.05, col="red")
-    legend("bottomright", legend=levels(factor(targets$Sample_Group)), xpd=T, fill=pal, bg="white")
+    legend("bottomright", legend=levels(factor(sampledata$Sample_Group)), xpd=T, fill=pal, bg="white")
   dev.off()
 }

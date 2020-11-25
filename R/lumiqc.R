@@ -1,17 +1,21 @@
+#' Plot QC results
+#'
 #' A function to run lumi QC
 #'
-#' @param mdata A filtered data frame of M-values
-#' @param pdata A filtered data frame of detection p-values.
+#' @param mdata Data Frame. A filtered data frame of M-values
+#' @param pdata Data Frame. A filtered data frame of detection p-values.
 #' @param contractid Character. The name of the contract or other value
-#' @param sampledata A data frame with the samplesheet.Generate manually or in arraydm::readdata().
+#' @param sampledata Data Frame. The project samplesheet.Generate manually or in arraydm::readdata().
 #' @param qctype Character indicating whether preQC or postQC is undertaken
-#' @param workdir Where to save the plots. (Default: working directory)
+#' @param workdir Character. Where to save the plots. (Default: working directory)
 #' @return Default lumi QC plots
 #' @export
 .plotLumiQC <- function(contractid, mdata, sampledata, pdata, qctype, workdir=NULL) {
-  if (!requireNamespace("lumi", quietly = TRUE)) {
-    stop("The lumi package is needed for this function to work. Please install it.",
-         call. = FALSE)
+  for (package in c("lumi", "arrayQualityMetrics")) {
+    if (!requireNamespace(package, quietly = TRUE)) {
+      stop(paste0("The ", package, " package is needed for this function to work. Please install it."),
+           call. = FALSE)
+    }
   }
 
   if(missing(contractid)){
@@ -56,7 +60,9 @@
     print("Running PreQC......")
 
     ## Set paths
-    outprefix=paste0(workdir,"/secondary_analysis/Results/preqc/", contractid)
+    print("check3")
+    dir.create(paste0(workdir,"/secondary_analysis/Results/qc"), showWarnings = FALSE, recursive=TRUE)
+    outprefix=paste0(workdir,"/secondary_analysis/Results/qc/", contractid)
 
     ## Get quality stats, input to lumi
     colnames(mdata) <- sampledata$ID
@@ -69,7 +75,7 @@
       print("Running PostQC......")
 
       ## Set paths
-      outprefix=paste0(workdir,"/secondary_analysis/Results/preqc/", contractid)
+      outprefix=paste0(workdir,"/secondary_analysis/Results/qc/", contractid)
 
       ## Get quality stats, input to lumi
       lumibatchnorm <- new('LumiBatch', detection=pdata, exprs=mdata, se.exprs=mdata)
@@ -91,15 +97,18 @@
   }
 
   ## Plot heatmap
+  print("OK1")
   png(paste(outprefix,"_", type, "_heatmap.png", sep=""), res=200, height=1000, width=1000)
    invisible(capture.output(arrayQualityMetrics::aqm.heatmap(lumistats)))
   dev.off()
 
+  print("OK2")
   ## Generate QC plots
   png(paste(outprefix,"_", type, "_samplerelation.png", sep=""), res=200, height=1000, width=1000); par(cex=0.6)
     plot(lumibatch, what='sampleRelation')
   dev.off()
 
+  print("OK3")
   png(paste(outprefix,"_", type, "_outliers.png", sep=""), res=200, height=1000, width=1000); par(cex=0.6)
     plot(lumibatch, what='outlier')
   dev.off()

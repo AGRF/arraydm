@@ -4,21 +4,21 @@
 \alias{arraypostqc}
 \title{A function to qc array data2}
 \usage{
-arraypostqc(contractid, swandata, pdata, sampledata, workdir = NULL, outprefix)
+arraypostqc(contractid, swandata, pdata, sampledata, workdir = NULL)
 }
 \arguments{
-\item{contractid}{The name of the contract}
+\item{contractid}{Character. The name of the contract}
 
-\item{swandata}{A data frame with the samplesheet.Generate manually or in arraydm::readdata()}
+\item{swandata}{Data Frame. The project samplesheet.Generate manually or in arraydm::readdata()}
 
-\item{pdata}{Detection P-values.}
+\item{pdata}{Data Frame. Detection P-values.}
 
-\item{sampledata}{A data frame with the samplesheet.Generate manually or in arraydm::readdata()}
+\item{sampledata}{Data Frame. The project samplesheet, generate manually or in arraydm::readdata()}
 
-\item{workdir}{Path to output location. (Default is working directory)}
+\item{workdir}{Character. Path to output location. (Default is working directory)}
 }
 \value{
-Testing return2
+M and B values, the RDS file and postQC plots.
 }
 \description{
 A function to qc array data2

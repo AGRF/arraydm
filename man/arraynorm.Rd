@@ -7,18 +7,18 @@
 arraynorm(contractid, arraydata, mdataraw, sampledata, workdir = NULL)
 }
 \arguments{
-\item{contractid}{The name of the contract}
+\item{contractid}{Character. The name of the contract}
 
 \item{arraydata}{An RGChannelSet generated manually, or in arraydm::readdata()}
 
-\item{mdataraw}{A filtered data frame of M-values}
+\item{mdataraw}{Data Frame. A filtered data frame of M-values}
 
-\item{sampledata}{A data frame with the samplesheet.Generate manually or in arraydm::readdata()}
+\item{sampledata}{Data Frame. The project samplesheet, generate manually or in arraydm::readdata()}
 
-\item{workdir}{Where to save the plots. (Default: working directory)}
+\item{workdir}{Character. Where to save the plots. (Default: working directory)}
 }
 \value{
-PreQC plots for detection p-value, quality filtered probe set
+PreQC plots for detection p-value, quality filtered probe set. 'swannorm' global object.
 }
 \description{
 Normalises methylation array data

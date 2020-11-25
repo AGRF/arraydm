@@ -4,12 +4,16 @@
 \alias{.plotDetP}
 \title{Visualises the detection P value of array prior to filtering}
 \usage{
-.plotDetP(contractid, pvals)
+.plotDetP(contractid, pvals, sampledata, workdir)
 }
 \arguments{
-\item{contractid}{The name of the contract}
+\item{contractid}{Character. The name of the contract}
 
-\item{pvals}{Data Frame with detection P-values}
+\item{pvals}{Data Frame. Detection P-values}
+
+\item{sampledata}{Data Frame. The project samplesheet.Generate manually or in arraydm::readdata()}
+
+\item{workdir}{Character. Path to output location. (Default is working directory)}
 }
 \value{
 A barplot of the detection P values for the unfiltered array

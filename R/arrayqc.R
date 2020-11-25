@@ -1,10 +1,12 @@
-#' A function to qc array data
+#' Array QC
+#'
+#' Functions to qc array data and summarise qc results.
 #'
 #' @param arraydata An RGChannelSet generated manually, or in arraydm::readdata()
-#' @param contractid The name of the contract
-#' @param sampledata A data frame with the samplesheet.Generate manually or in arraydm::readdata()
-#' @param workdir Path to output location. (Default is working directory)
-#' @return If PreQC is chosen, plots for detection p-value and a quality filtered probe set. For the postQC configuration function returns M and B values, the RDS file and postQC plots.
+#' @param contractid Character. The name of the contract
+#' @param sampledata Data Frame. The project samplesheet, generate manually or in arraydm::readdata()
+#' @param workdir Character. Path to output location. (Default is working directory)
+#' @return Plots for detection p-value and a quality filtered probe set.
 #' @export
 arraypreqc <- function(contractid, arraydata, sampledata, workdir=NULL) {
   if (!requireNamespace("RColorBrewer", quietly = TRUE)) {
@@ -31,11 +33,14 @@ arraypreqc <- function(contractid, arraydata, sampledata, workdir=NULL) {
     stop()
   }
 
+  ## Set output location
+  dir.create(paste0(workdir,"/secondary_analysis/Results/qc"), showWarnings = FALSE, recursive=TRUE)
+
   print("Running PreQC......")
 
   ## Add samplenames
-  targets$ID = paste(targets$Sample_Group, targets$Sample_Name, sep=".")
-  minfi::sampleNames(arraydata) = targets$ID
+  sampledata$ID = paste(sampledata$Sample_Group, sampledata$Sample_Name, sep=".")
+  minfi::sampleNames(arraydata) = sampledata$ID
 
   ## Calculate pvals
   pvals = minfi::detectionP(arraydata)
@@ -44,7 +49,7 @@ arraypreqc <- function(contractid, arraydata, sampledata, workdir=NULL) {
 
   pal <<- RColorBrewer::brewer.pal(ngroups,"Set2")    # Bad practice but im doing it anyway
   print("Plotting Detection P..........")
-  .plotDetP(contractid, pvals, workdir)
+  .plotDetP(contractid, pvals, workdir, sampledata)
 
   ## Filter by mean detection across all samples
   samplesin = colMeans(pvals) < 0.05
@@ -65,7 +70,6 @@ arraypreqc <- function(contractid, arraydata, sampledata, workdir=NULL) {
   print(paste0("Number of raw probes is ", nprobes))
 
   print("Saving 'rawmeth' Object..........")
-  dir.create(paste0(workdir,"/secondary_analysis/"), showWarnings = FALSE, recursive=TRUE)
   saveRDS(rawmeth, paste0(workdir, "/secondary_analysis/", contractid, "_rawmeth.RDS"))
 
   ## Filter failed probes (null/infinite calls)
@@ -80,21 +84,21 @@ arraypreqc <- function(contractid, arraydata, sampledata, workdir=NULL) {
   identical(rownames(pvals_filt), rownames(rawmeth_mvals))
 
   assign("epic", epic, envir = .GlobalEnv)
-  assign("targets", targets, envir = .GlobalEnv)
+  assign("targets", sampledata, envir = .GlobalEnv)
   assign("pvals", pvals, envir = .GlobalEnv)
   assign("pvals_filt", pvals_filt, envir = .GlobalEnv)
   assign("rawmeth_mvals", rawmeth_mvals, envir = .GlobalEnv)
 
   print("Plotting PreQC Figures..........")
-#  .plotLumiQC(contractid=contractid, mdata=rawmeth_mvals, sampledata=targets, pdata=pvals_filt, qctype="preQC", workdir=workdir)
+  .plotLumiQC(contractid=contractid, mdata=rawmeth_mvals, sampledata=targets, pdata=pvals_filt, qctype="preQC", workdir=workdir)
 }
 
 #' A function to qc array data2
 #'
-#' @return Testing return2
 #' @inheritParams arraypreqc
-#' @param swandata A data frame with the samplesheet.Generate manually or in arraydm::readdata()
-#' @param pdata Detection P-values.
+#' @param swandata Data Frame. The project samplesheet.Generate manually or in arraydm::readdata()
+#' @param pdata Data Frame. Detection P-values.
+#' @return M and B values, the RDS file and postQC plots.
 #' @export
 arraypostqc <- function(contractid, swandata, pdata, sampledata, workdir=NULL) {
   print("Running PostQC......")
@@ -139,7 +143,7 @@ arraypostqc <- function(contractid, swandata, pdata, sampledata, workdir=NULL) {
   pvals_filt <- pdata[rownames(rawswan_filt2),]
   colnames(pvals_filt) <- colnames(rawswan_filt2)
   identical(rownames(pvals_filt), rownames(rawswan_filt2))
-  pvals <<- pvals_filt
+  pvals <<- pvals_filtbuild()
 
   ## Get M and B values
   mvals <<- minfi::getM(rawswan_filt2)
@@ -155,5 +159,5 @@ arraypostqc <- function(contractid, swandata, pdata, sampledata, workdir=NULL) {
   write.table(bvals, paste(outprefix,"_Bvalues.csv", sep=""), quote=F, col.names=T, row.names=T)
 
   ## Plotting post-qc
-# .plotLumiQC(outprefix=contractid, mdata=mvals, sampledata=targets, pdata=pvals_filtnorm, qctype="postQC", workdir)
+ .plotLumiQC(contractid=contractid, mdata=mvals, sampledata=targets, pdata=pvals_filtnorm, qctype="postQC", workdir)
 }

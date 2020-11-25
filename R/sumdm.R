@@ -1,15 +1,17 @@
+#' Summarise Models
+#'
 #' A function to collate and report differential methylation results
 #'
 #' @param contractid Character. The name of the contract or other value
-#' @param contrastm A matrix of contrasts
-#' @param contrasts A named list with contrasts to apply
-#' @param bdata A cleaned, quality controlled data frame of B-values
-#' @param sampledata A data frame with the samplesheet.Generate manually or in arraydm::readdata().
-#' @param workdir Where to save the plots. (Default: working directory)
+#' @param contrastm Matrix. A matrix of contrasts
+#' @param contrasts List. A named list with contrasts to apply
+#' @param bdata Data Frame. Cleaned, quality controlled B-values
+#' @param sampledata Data Frame. The project samplesheet.Generate manually or in arraydm::readdata().
+#' @param workdir Character. Where to save the plots. (Default: working directory)
 #' @return Annotated data frames of DM results, heatmaps and volcano plots
 #' @export
 arraysumm <- function(contractid, bdata, sampledata, workdir=NULL, contrastm) {
-  for (package in c("RColorBrewer", "grDevices", "limma", "gplots")) {
+  for (package in c("RColorBrewer", "grDevices", "limma", "gplots", "viridis")) {
     if (!requireNamespace(package, quietly = TRUE)) {
       stop(paste0("The ", package, " package is needed for this function to work. Please install it."),
            call. = FALSE)
@@ -43,25 +45,29 @@ arraysumm <- function(contractid, bdata, sampledata, workdir=NULL, contrastm) {
   ## Set outdir
   outprefix=paste0(workdir,"/secondary_analysis/Results/comparisons/", contractid)
 
-  ## Annotate results
-#  print("Annotating genes......")
-#  genes <- strsplit(.ann450k$UCSC_RefGene_Name[1:50], ";", fixed=TRUE)
-#  geneLabels <- sapply(genes, "[", 1)
-#  genelabels <- matrix(geneLabels)
-#  row.names(genelabels)<-rownames(.ann450k)
+  ## Set inputs
+  lrt_list <- readRDS(paste0(workdir, "/secondary_analysis/", "lrt_list.RDS"))
 
-#  genelabels[which(is.na(genelabels)), 1] <- "NA"
-  print(contrastm)
+  ## Annotate results
+  # print("Annotating genes......")
+  # genes <- strsplit(.ann450k$UCSC_RefGene_Name[1:50], ";", fixed=TRUE)
+  # geneLabels <- sapply(genes, "[", 1)
+  # genelabels <- matrix(geneLabels)
+  # row.names(genelabels)<-rownames(.ann450k)
+
+  # genelabels[which(is.na(genelabels)), 1] <- "NA"
   comparisons <- colnames(contrastm)
 
+  i=1
   for (comparison in comparisons) {
     print(paste0("Summarising comparison: ", comparison, "......"))
     # Get names of samples used in comparison
     comparison.groups <- names(which(contrastm[,comparison] != 0))
     samples <- sampledata[sampledata$Sample_Group %in% comparison.groups, "Sample_Name"]
 
-    # get comparison data
-    resall <- limma::topTable(fit2, adjust="BH", num=Inf, coef=comparison)
+    # get comparison data for all probes
+    #resall <- limma::topTable(fit2, adjust="BH", num=Inf, coef=comparison)
+    resall <- lrt_list[[i]]
 
     # annotate top 50 probes
     .ann450k_tmp50 <- .ann450k[row.names(resall)[1:50],]
@@ -102,12 +108,13 @@ arraysumm <- function(contractid, bdata, sampledata, workdir=NULL, contrastm) {
 
     ## Pheatmap
     png(paste(outprefix, "_", comparison, "_DM_Pheatmap_top50.png", sep=""), res=150, height=1000, width=1000); par(cex=0.6)
-      pheatmap::pheatmap(bdata[row.names(resall)[1:50],], color = viridis(100), trace="none",
+      pheatmap::pheatmap(bdata[row.names(resall)[1:50],], color = viridis::viridis(100), trace="none",
          main=paste("Top 50 most differentially methylated\ngenes between ", comparison, sep=""), ColSideColors=col.group,
          scale="row", annotation_names_row=T, labels_row=genelab, fontsize_row=6)
     dev.off()
 
     ## Plot volcano
     .plotVolc(contractid, sampledata, workdir, contrastm)
+    i=i+1
   }
 }

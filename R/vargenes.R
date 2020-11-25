@@ -1,10 +1,10 @@
 #' A function to run vatiance analysis
 #'
 #' @param contractid Character. The name of the contract or other value
-#' @param mdata A filtered data frame of M-values
-#' @param sampledata A data frame with the samplesheet.Generate manually or in arraydm::readdata().
-#' @param workdir Where to save the plots. (Default: working directory)
-#' @return Default lumi QC plots
+#' @param mdata Data Frame. A filtered data frame of M-values
+#' @param sampledata Data Frame. A data frame with the samplesheet.Generate manually or in arraydm::readdata().
+#' @param workdir Character. Where to save the plots. (Default: working directory)
+#' @return Outputs heatmaps and variance spreadsheets to your WD
 #' @export
 arrayvar <- function(contractid, mdata, sampledata, workdir=NULL) {
   for (package in c("RColorBrewer", "grDevices", "limma", "gplots")) {

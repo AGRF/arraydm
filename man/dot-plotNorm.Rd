@@ -2,26 +2,26 @@
 % Please edit documentation in R/plotnorm.R
 \name{.plotNorm}
 \alias{.plotNorm}
-\title{Plots normalised data}
+\title{Array Normalisation}
 \usage{
-.plotNorm(plotprefix, rawdata, quantdata, swandata, sampledata, workdir)
+.plotNorm(contractid, rawdata, quantdata, swandata, sampledata, workdir)
 }
 \arguments{
-\item{plotprefix}{The name of the contract}
-
-\item{rawdata}{A data frame of M-values}
+\item{rawdata}{Data Frame. Raw M-values}
 
 \item{quantdata}{Quantile normalised array.}
 
 \item{swandata}{SWAN normalised array.}
 
-\item{sampledata}{A data frame with the samplesheet.Generate manually or in arraydm::readdata()}
+\item{sampledata}{Data Frame. The project samplesheet.Generate manually or in arraydm::readdata()}
 
-\item{workdir}{Where to save the plots. (Default: working directory)}
+\item{workdir}{Character. Where to save the plots. (Default: working directory)}
+
+\item{contract}{The name of the contract or similar ID}
 }
 \value{
 Default SWAN Normalised array and data distribution
 }
 \description{
-Plots normalised data
+Plots normalised data. Best applied after arraydm::arraypreqc() where most of the inputs are generated.
 }

@@ -1,11 +1,13 @@
-#' Plots normalised data
+#' Array Normalisation
+#'
+#' Plots normalised data. Best applied after arraydm::arraypreqc() where most of the inputs are generated.
 #'
 #' @param contract The name of the contract or similar ID
-#' @param rawdata A data frame of M-values
+#' @param rawdata Data Frame. Raw M-values
 #' @param quantdata Quantile normalised array.
-#' @param sampledata A data frame with the samplesheet.Generate manually or in arraydm::readdata()
+#' @param sampledata Data Frame. The project samplesheet.Generate manually or in arraydm::readdata()
 #' @param swandata SWAN normalised array.
-#' @param workdir Where to save the plots. (Default: working directory)
+#' @param workdir Character. Where to save the plots. (Default: working directory)
 #' @return Default SWAN Normalised array and data distribution
 #' @export
 .plotNorm <- function(contractid, rawdata, quantdata, swandata, sampledata, workdir){
@@ -44,8 +46,8 @@
   }
 
   ## Set Paths
-  outprefix=paste0(workdir,"/secondary_analysis/Results/postqc/", contractid)
-  dir.create(paste0(workdir,"/secondary_analysis/Results/postqc/"), showWarnings = FALSE, recursive=T)
+  outprefix=paste0(workdir,"/secondary_analysis/Results/qc/", contractid)
+  dir.create(paste0(workdir,"/secondary_analysis/Results/qc/"), showWarnings = FALSE, recursive=T)
 
   ## Set plotting palette
   ngroups=ifelse(length(unique(sampledata$Sample_Group)) < 3, 3, length(unique(sampledata$Sample_Group)))

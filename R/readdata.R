@@ -1,9 +1,11 @@
+#' Read Data
+#'
 #' A function to load array data
 #'
-#' @param contractid The name of the contract
-#' @param samplesheet The suffix of the sample sheet
-#' @param workdir The path of the working directory
-#' @return The readdata object containing the methylation experiment and accompanying annotations
+#' @param contractid Character. The name of the contract
+#' @param samplesheet Character. The suffix of the sample sheet
+#' @param workdir Character. The path of the working directory
+#' @return The readdata object containing the methylation experiment and accompanying. Global objects 'epic' and 'targets' with the formatted inputs.
 #' @export
 arrayread <- function(contractid, workdir, samplesheet) {
   if (!requireNamespace("minfi", quietly = TRUE)) {
@@ -32,7 +34,7 @@ arrayread <- function(contractid, workdir, samplesheet) {
   }
 
   ## Create dir structure
-  dir.create(paste0(workdir, "/secondary_analysis"))
+  dir.create(paste0(workdir, "/secondary_analysis"), showWarnings = FALSE)
 
   print("Loading Annotations..........")
  .annotation <- c(array = "IlluminaHumanMethylationEPICanno", annotation = "ilm10b4.hg19")
