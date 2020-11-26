@@ -9,7 +9,7 @@
 #' @param workdir Character. Where to save the plots. (Default: working directory)
 #' @return CSV spreadsheets with Gene Ontology results.
 #' @export
-dmgo <- function(contractid, sampledata, workdir=NULL, myrds, contrastm) {
+arraygo <- function(contractid, sampledata, workdir=NULL, myrds, contrastm) {
   for (package in c("GOstats", "biomaRt", "lumiHumanAll.db", "DBI", "annotate")) {
     if (!requireNamespace(package, quietly = TRUE)) {
       stop(paste0("The ", package, " package is needed for this function to work. Please install it."),
@@ -95,7 +95,7 @@ dmgo <- function(contractid, sampledata, workdir=NULL, myrds, contrastm) {
                   pvalueCutoff= 0.01,
                   conditional=FALSE,
                   testDirection="over")
-      hgOver <- hyperGTest(params)
+      hgOver <- GOstats::hyperGTest(params)
 
       ## Get the p-values of the test
       gGhyp.pv <- pvalues(hgOver)

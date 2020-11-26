@@ -14,3 +14,4 @@ ls()
 data
 load("/Users/LelGray/Dropbox/weekend_work/arraydm/data/sampledata.Rds")
 ls()
+load("/Users/LelGray/Dropbox/weekend_work/arraydm/data/data.Rds")

@@ -47,20 +47,20 @@
     stop()
   }
 
-  type <- ifelse(grep("pre", qctype, ignore.case=TRUE),
-         grep("pre", qctype, value=TRUE, ignore.case=TRUE),
-         grep("post", qctype, value=TRUE, ignore.case=TRUE))
-
-  if (length(type) == 0) {
-    message("error: type is invalid..... Input was: ", qctype)
-    stop()
+  ## Messy but it works, unlike my nested ifelse statement
+  if(length(grep("pre", qctype, ignore.case=TRUE))!=0) {
+      type=grep("pre", qctype, value=TRUE, ignore.case=TRUE)
+  } else if(length(grep("post", qctype, value=TRUE, ignore.case=TRUE))!=0) {
+      type=grep("post", qctype, value=TRUE, ignore.case=TRUE)
+  } else {
+      message("error: type is invalid..... Input was: ", qctype)
+      stop()
   }
 
-  if(grep("pre", type, ignore.case=TRUE)){
+  if(length(grep("pre", type, ignore.case = TRUE))!=0){
     print("Running PreQC......")
 
     ## Set paths
-    print("check3")
     dir.create(paste0(workdir,"/secondary_analysis/Results/qc"), showWarnings = FALSE, recursive=TRUE)
     outprefix=paste0(workdir,"/secondary_analysis/Results/qc/", contractid)
 
@@ -70,8 +70,10 @@
     pData(lumibatch) <- sampledata
     lumistats <- arrayQualityMetrics::prepdata(expressionset = lumibatch, do.logtransform = FALSE, intgroup="Sample_Group")
     summary(lumibatch, 'QC')
+    lumis <- lumistats
+    lumib <- lumibatch
 
-  } else if(grep("post", type, ignore.case=TRUE)){
+  } else if(length(grep("post", type, ignore.case = TRUE))!=0){
       print("Running PostQC......")
 
       ## Set paths
@@ -82,14 +84,16 @@
       pData(lumibatchnorm) <- sampledata
       lumistatsnorm <- arrayQualityMetrics::prepdata(expressionset = lumibatchnorm, do.logtransform = FALSE, intgroup="Sample_Group")
       summary(lumibatchnorm, 'QC')
+      lumis <- lumistatsnorm
+      lumib <- lumibatchnorm
 
       print("Plotting Gender......")
-      png(paste(outprefix,"/../gender_check.png" ,sep=""), res=200, height=1000, width=1000)
-        plotSex(rawquant)
+      png(paste(workdir,"/secondary_analysis/gender_check.png" ,sep=""), res=200, height=1000, width=1000)
+              minfi::plotSex(rawquant)
       dev.off()
 
       png(paste(outprefix,"_", type, "_outliers.png", sep=""), res=200, height=1000, width=1000); par(cex=0.6)
-        detectOutlier(lumibatchnorm, ifPlot=TRUE)
+        lumi::detectOutlier(lumib, ifPlot=TRUE)
       dev.off()
 
   } else {
@@ -97,36 +101,34 @@
   }
 
   ## Plot heatmap
-  print("OK1")
   png(paste(outprefix,"_", type, "_heatmap.png", sep=""), res=200, height=1000, width=1000)
-   invisible(capture.output(arrayQualityMetrics::aqm.heatmap(lumistats)))
+   invisible(capture.output(arrayQualityMetrics::aqm.heatmap(lumis)))
   dev.off()
 
-  print("OK2")
   ## Generate QC plots
   png(paste(outprefix,"_", type, "_samplerelation.png", sep=""), res=200, height=1000, width=1000); par(cex=0.6)
-    plot(lumibatch, what='sampleRelation')
+    lumi::plot(lumib, what='sampleRelation')
   dev.off()
 
-  print("OK3")
   png(paste(outprefix,"_", type, "_outliers.png", sep=""), res=200, height=1000, width=1000); par(cex=0.6)
-    plot(lumibatch, what='outlier')
+    # plot(lumibatch, what='outlier')
+    lumi::detectOutlier(lumib, metric = "euclidean", standardize = TRUE, Th = 2, ifPlot = TRUE)
   dev.off()
 
   png(paste(outprefix,"_", type, "_samplerelation_MDS.png", sep=""), res=200, height=1000, width=1000); par(cex=0.6)
-    plot(lumibatch, what='sampleRelation', method='mds')
+    lumi::plot(lumib, what='sampleRelation', method='mds')
   dev.off()
 
   png(paste(outprefix,"_", type, "_density_mvals.png", sep=""), res=200, height=1000, width=1000); par(cex=0.6)
-    density(lumibatch, xlab="M-value")
+    lumi::density(lumib, xlab="M-value")
   dev.off()
 
   png(paste(outprefix,"_", type, "_boxplot_mvals.png", sep=""), res=200, height=1000, width=1500); par(cex=0.6)
-    boxplot(lumibatch)
+    lumi::boxplot(lumib)
   dev.off()
 
   png(paste(outprefix,"_", type, "_MDS_mvals.png", sep=""), res=200, height=1000, width=1000); par(cex=0.6)
-    plotMDS(lumibatch)
+    limma::plotMDS(lumib)
   dev.off()
 }
 

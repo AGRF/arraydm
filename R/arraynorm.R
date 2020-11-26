@@ -42,7 +42,7 @@ arraynorm <- function(contractid, arraydata, mdataraw, sampledata, workdir=NULL)
   ## Normalise
   print("Normalising Arrays..........")
   rawswan = minfi::preprocessSWAN(arraydata)
-  rawquant = minfi::preprocessQuantile(arraydata)
+  rawquant <<- minfi::preprocessQuantile(arraydata)
 
   ## Plot Normalised mvals
   print("Plotting Results..........")

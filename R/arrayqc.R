@@ -49,7 +49,7 @@ arraypreqc <- function(contractid, arraydata, sampledata, workdir=NULL) {
 
   pal <<- RColorBrewer::brewer.pal(ngroups,"Set2")    # Bad practice but im doing it anyway
   print("Plotting Detection P..........")
-  .plotDetP(contractid, pvals, workdir, sampledata)
+  .plotDetP(contractid, pvals, workdir, sampledata=targets)
 
   ## Filter by mean detection across all samples
   samplesin = colMeans(pvals) < 0.05
@@ -64,7 +64,6 @@ arraypreqc <- function(contractid, arraydata, sampledata, workdir=NULL) {
   ## Convert raw to M values and B values
   print("Generating M and B values and removing failed probes ..........")
   rawmeth <<- preprocessRaw(epic)
-  print(paste0("rawmeth class is ", class(rawmeth)))
   rawmeth.mvals <- getM(rawmeth)
   nprobes=dim(rawmeth)[1]
   print(paste0("Number of raw probes is ", nprobes))
@@ -130,12 +129,12 @@ arraypostqc <- function(contractid, swandata, pdata, sampledata, workdir=NULL) {
 
   ## Remove known SNPs
   rawswan_filt1 = minfi::dropLociWithSnps(rawswan_pfilt)
-  nprobes=dim(rawswan_filt1)[1]
+  nprobes=(dim(rawswan_pfilt)[1])-(dim(rawswan_filt1)[1])
   print(paste0("Dropping ", nprobes, " SNP......"))
 
   ## Drop X, Y
-  keep = !(featureNames(rawswan_filt1) %in% .ann450k$Name[.ann450k$chr %in% c("chrX","chrY")])
-  nprobes=as.numeric(table(keep)[2])
+  keep = !(featureNames(rawswan_filt1) %in% rownames(.ann450k)[.ann450k$chr %in% c("chrX","chrY")])
+  nprobes=as.numeric(table(keep)[1])
   print(paste0("Dropping ", nprobes, " X,Y probes ......"))
   rawswan_filt2 = rawswan_filt1[keep,]
 
@@ -143,11 +142,13 @@ arraypostqc <- function(contractid, swandata, pdata, sampledata, workdir=NULL) {
   pvals_filt <- pdata[rownames(rawswan_filt2),]
   colnames(pvals_filt) <- colnames(rawswan_filt2)
   identical(rownames(pvals_filt), rownames(rawswan_filt2))
-  pvals <<- pvals_filtbuild()
+  pvals <<- pvals_filt
 
   ## Get M and B values
   mvals <<- minfi::getM(rawswan_filt2)
   bvals <<- minfi::getBeta(rawswan_filt2)
+  #nprobes=nrow(mvals)
+  #print("Keeping ", nprobes, " probes after QC")
 
   colnames(swanpvals) <- colnames(mvals)
   pvals_filtnorm <- swanpvals[rownames(mvals), ]

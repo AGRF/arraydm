@@ -76,12 +76,12 @@ auto_arraydm <- function (contractid, sampledata, workdir, contrastlist) {
   ## Pathways Analysis
   step="Pathways Analysis"
   logstep(step)
-  dmpaths(contractid=contractid, sampledata=targets, workdir=workdir, myrds=lrt_list.RDS, contrastm=cont.matrix)
+  arraypaths(contractid=contractid, sampledata=targets, workdir=workdir, myrds=lrt_list.RDS, contrastm=cont.matrix)
 
   ## Gene Ontology
   step="Gene Ontology"
   logstep(step)
-  dmgo(contractid=contractid, sampledata=targets, workdir=workdir, myrds=lrt_list.RDS, contrastm=cont.matrix)
+  arraygo(contractid=contractid, sampledata=targets, workdir=workdir, myrds=lrt_list.RDS, contrastm=cont.matrix)
 
   ## Close error logging
   close(errorfile)

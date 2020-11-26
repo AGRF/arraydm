@@ -9,7 +9,7 @@
 #' @param workdir Character. Where to save the plots. (Default: working directory)
 #' @return CSV spreadsheets with Reactome pathways results and enrichment results. Dot plot and barplots of enrichment results.
 #' @export
-dmpaths <- function(contractid, sampledata, workdir=NULL, myrds, contrastm) {
+arraypaths <- function(contractid, sampledata, workdir=NULL, myrds, contrastm) {
   for (package in c("reactome.db", "biomaRt", "org.Hs.eg.db", "ReactomePA", "dplyr")) {
     if (!requireNamespace(package, quietly = TRUE)) {
       stop(paste0("The ", package, " package is needed for this function to work. Please install it."),
@@ -42,7 +42,7 @@ dmpaths <- function(contractid, sampledata, workdir=NULL, myrds, contrastm) {
   }
 
   ## Set paths
-  dir.create(paste0(workdir,"/secondary_analysis/Results/pathways"), showWarnings = FALSE)
+  dir.create(paste0(workdir,"/secondary_analysis/Results/pathways/"), showWarnings = FALSE)
   outprefix=paste0(workdir,"/secondary_analysis/Results/pathways/", contractid)
 
   ## Set inputs
@@ -82,7 +82,7 @@ dmpaths <- function(contractid, sampledata, workdir=NULL, myrds, contrastm) {
     # Get entrezID to match to reactome pathway
     resall$`Entrez ID` <- anno$`Entrez ID`
     resall_pass <- resall[which(resall$`Entrez ID`!="NA"),]
-    resall_anno <- resall_pass[ resall_pass$`Entrez ID` %in% keys( reactome.db, "ENTREZID" ) & !is.na( resall_pass$adj.P.Val) , ]
+    resall_anno <- resall_pass[ resall_pass$`Entrez ID` %in% AnnotationDbi::keys( reactome.db::reactome.db, "ENTREZID" ) & !is.na( resall_pass$adj.P.Val) , ]
     cat("nrows is: ")
     cat("ID's before FDR filter ", nrow(resall_pass),"\n")
     cat("ID's after filter ", nrow(resall_anno), "\n")
@@ -91,11 +91,11 @@ dmpaths <- function(contractid, sampledata, workdir=NULL, myrds, contrastm) {
     resall_anno$entrezid <- resall_anno$`Entrez ID`
 
     ## Annotate subset of DB (make unique keys)
-    reactomeTable <- suppressWarnings(AnnotationDbi::select( reactome.db, keys=as.character(resall_anno$entrezid), keytype="ENTREZID", columns=c("ENTREZID","REACTOMEID")))
+    reactomeTable <- suppressWarnings(AnnotationDbi::select( reactome.db::reactome.db, keys=as.character(resall_anno$entrezid), keytype="ENTREZID", columns=c("ENTREZID","REACTOMEID")))
     reactomeTable <- unique(reactomeTable)
 
     ## Convert Entrezt back to common gene name
-    geneTable <- suppressWarnings(unique(AnnotationDbi::select(org.Hs.eg.db, keys=reactomeTable$ENTREZID, keytype="ENTREZID", columns=c("SYMBOL","ENTREZID"))))
+    geneTable <- suppressWarnings(unique(AnnotationDbi::select(org.Hs.eg.db::org.Hs.eg.db, keys=reactomeTable$ENTREZID, keytype="ENTREZID", columns=c("SYMBOL","ENTREZID"))))
     reactomeDB_human<-merge(reactomeTable, geneTable, by="ENTREZID", all.x=T)[2:3]
 
     ## Make a vector of genes in each pathway
@@ -126,7 +126,7 @@ dmpaths <- function(contractid, sampledata, workdir=NULL, myrds, contrastm) {
         strength    = sum( resall_anno$logFC[inReact] ) / sqrt(sum(inReact)),
         pvalue=if(!inherits(myError, "error")){t.test( resall_anno$logFC[ inReact ] )$p.value} else {"NA"},
         #pvalue      = t.test( res2$logFC[ inReact ] )$p.value,
-        reactomeName= if(is.character(reactomePATHID2NAME[[reactomeID]])){reactomePATHID2NAME[[reactomeID]]} else {print("NA")},
+        reactomeName= if(is.character(reactome.db::reactomePATHID2NAME[[reactomeID]])){reactome.db::reactomePATHID2NAME[[reactomeID]]} else {print("NA")},
         #reactomeName = reactomePATHID2NAME[[reactomeID]][1],
         stringsAsFactors = FALSE, check.rows=T )
     }
@@ -166,11 +166,11 @@ dmpaths <- function(contractid, sampledata, workdir=NULL, myrds, contrastm) {
       enr <- ReactomePA::enrichPathway(gene=unique(resall_sig$entrezid), organism="human", pvalueCutoff=0.05, readable=T)
 
       png(paste0(outprefix, "_", comparison, "_enrichment_barplot_2000var.png"), res=125, width=1000, height=500)
-        barplot(enr, showCategory=10, title = paste0("barplot ", comparison))
+        ReactomePA::barplot(enr, showCategory=10, title = paste0("barplot ", comparison))
       dev.off()
 
       png(paste0(outprefix, "_", comparison, "_enrichment_dotplot_2000var.png"), res=125, width=1000, height=500)
-        dotplot(enr, showCategory=10, title = paste0("dotplot ", comparison))
+        ReactomePA::dotplot(enr, showCategory=10, title = paste0("dotplot ", comparison))
       dev.off()
     } else {
       print(paste0("Not enough significant genes for enrichemnt"))

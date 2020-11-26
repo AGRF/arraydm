@@ -31,14 +31,9 @@
     message("error: input 'pvals' not found.....")
     exit()
   }
-  print("Sampledata is:")
-  print(sampledata)
 
   ## Take the mean
   plotdata = apply(pvals, 2 ,mean)
-  print(class(plotdata))
-  print(sampledata$Sample_Name)
-  print(class(sampledata$Sample_Name))
 
   ## Plot Detection P
   png(paste(workdir,"/secondary_analysis/Results/qc/", contractid,"_preQC_detectionP.png", sep=""), res=200, height=1000, width=1000)
@@ -49,5 +44,5 @@
         ylab="Mean detection p-value")
     abline(h=0.05, col="red")
     legend("bottomright", legend=levels(factor(sampledata$Sample_Group)), xpd=T, fill=pal, bg="white")
-  dev.off()
+    try(dev.off(), silent = TRUE)
 }
