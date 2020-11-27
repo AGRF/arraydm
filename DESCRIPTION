@@ -14,6 +14,7 @@ Imports:
     DBI,
     biomaRt,
     calibrate,
+    enrichplot,
     GOstats,
     gplots,
     IlluminaHumanMethylationEPICanno.ilm10b4.hg19,
@@ -31,7 +32,7 @@ Suggests:
     dplyr,
     reshape2,
     ggplot2,
-    sampledata,
+    exampletargets,
     exampledata
 License: Proprietary. Do not use outside AGRF.
 Encoding: UTF-8

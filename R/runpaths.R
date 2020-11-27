@@ -10,7 +10,7 @@
 #' @return CSV spreadsheets with Reactome pathways results and enrichment results. Dot plot and barplots of enrichment results.
 #' @export
 arraypaths <- function(contractid, sampledata, workdir=NULL, myrds, contrastm) {
-  for (package in c("reactome.db", "biomaRt", "org.Hs.eg.db", "ReactomePA", "dplyr")) {
+  for (package in c("reactome.db", "biomaRt", "org.Hs.eg.db", "ReactomePA", "graphics", "dplyr", "enrichplot", "DOSE")) {
     if (!requireNamespace(package, quietly = TRUE)) {
       stop(paste0("The ", package, " package is needed for this function to work. Please install it."),
            call. = FALSE)
@@ -100,10 +100,10 @@ arraypaths <- function(contractid, sampledata, workdir=NULL, myrds, contrastm) {
 
     ## Make a vector of genes in each pathway
     reactomeDB_human_uniq <- unique(reactomeDB_human)
-    res<-aggregate(SYMBOL~REACTOMEID, reactomeDB_human_uniq, FUN= paste, collapse='|')
+    res <-aggregate(SYMBOL~REACTOMEID, reactomeDB_human_uniq, FUN= paste, collapse='|')
 
     ## Final DF (matrix of reactome ID (rows) and entrezid (cols), TRUE/FALSE)
-    reactDB <- do.call( rbind, with(reactomeTable, tapply(
+    reactDB <<- do.call( rbind, with(reactomeTable, tapply(
       ENTREZID, factor(REACTOMEID), function(x) resall_anno$entrezid %in% x ) ))
 
     colnames(reactDB) <- rownames(resall_anno)
@@ -161,16 +161,18 @@ arraypaths <- function(contractid, sampledata, workdir=NULL, myrds, contrastm) {
     n = ifelse(nrow(resall_sig)>500, 500, nrow(resall_sig))
     ngenes = length(unique(resall_sig$entrezid))
 
+    dir.create(paste0(workdir,"/secondary_analysis/Results/pathways"), showWarnings = FALSE)
+
     if(ngenes>20) {
       print(paste0("Enrichment for top ", n, " probes"))
       enr <- ReactomePA::enrichPathway(gene=unique(resall_sig$entrezid), organism="human", pvalueCutoff=0.05, readable=T)
 
-      png(paste0(outprefix, "_", comparison, "_enrichment_barplot_2000var.png"), res=125, width=1000, height=500)
-        ReactomePA::barplot(enr, showCategory=10, title = paste0("barplot ", comparison))
+      png(paste0(outprefix, "_", comparison, "_enrichment_barplot_top10.png"), res=125, width=1000, height=500)
+        barplot(enr, showCategory=10, title = paste0("barplot ", comparison))
       dev.off()
 
-      png(paste0(outprefix, "_", comparison, "_enrichment_dotplot_2000var.png"), res=125, width=1000, height=500)
-        ReactomePA::dotplot(enr, showCategory=10, title = paste0("dotplot ", comparison))
+      png(paste0(outprefix, "_", comparison, "_enrichment_dotplot_top10.png"), res=125, width=1000, height=500)
+        dotplot(enr, showCategory=10, title = paste0("dotplot ", comparison))
       dev.off()
     } else {
       print(paste0("Not enough significant genes for enrichemnt"))

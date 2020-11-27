@@ -83,6 +83,9 @@ auto_arraydm <- function (contractid, sampledata, workdir, contrastlist) {
   logstep(step)
   arraygo(contractid=contractid, sampledata=targets, workdir=workdir, myrds=lrt_list.RDS, contrastm=cont.matrix)
 
+  # Write logfile footer
+  writeLines(paste0("Finished DM pipeline at Date/Time: ", Sys.time()), errorfile)
+
   ## Close error logging
-  close(errorfile)
+  # close(errorfile)
 }
